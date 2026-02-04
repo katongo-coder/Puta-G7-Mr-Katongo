@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | Grade 7B</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #3498db; --light: #f4f7f6; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--light); display: flex; padding-top: 40px; }
+        
+        /* Barber System Features */
+        .signature-scroll { width: 100%; background: #1a252f; color: #f1c40f; padding: 10px 0; position: fixed; top: 0; left: 0; white-space: nowrap; overflow: hidden; font-weight: bold; z-index: 2000; }
+        .marquee { display: inline-block; animation: scroll 20s linear infinite; }
+        @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        .rotating-badge { position: fixed; bottom: 20px; right: 20px; width: 120px; height: 120px; background: #f1c40f; color: #2c3e50; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-align: center; animation: rotate 8s linear infinite; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 100; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Sidebar and Main Content */
+        .sidebar { width: 250px; background: var(--primary); color: white; height: 100vh; position: fixed; transition: 0.3s; left: 0; top: 40px; z-index: 1000; }
+        .sidebar.hidden { left: -250px; }
+        .main { margin-left: 250px; padding: 40px; width: 100%; transition: 0.3s; margin-top: 20px; }
+        .main.full { margin-left: 0; }
+        
+        .profile-area { padding: 20px; text-align: center; border-bottom: 1px solid #34495e; }
+        .profile-img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--accent); cursor: pointer; object-fit: cover; margin-bottom: 10px; }
+        
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar li a { padding: 15px 25px; color: white; text-decoration: none; display: block; border-bottom: 1px solid #34495e; }
+        .sidebar li a:hover { background: var(--accent); }
+
+        .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
+        .card h2 { color: var(--primary); margin: 0; font-size: 18px; }
+        .card p { font-size: 32px; font-weight: bold; color: var(--accent); margin: 10px 0; }
+
+        .menu-btn { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="signature-scroll">
+        <div class="marquee">MR. KATONGO CHRISFORD GRADE 7B CLASS TEACHER • PERFORMANCE AND ABSENTEEISM TRACKED IN REAL-TIME  &copy; 2026 ✨</div>
+    </div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="profile-area">
+            <input type="file" id="pic-upload" style="display:none" onchange="uploadPic(this)">
+            <img id="user-pic" src="https://www.w3schools.com/howto/img_avatar.png" class="profile-img" onclick="document.getElementById('pic-upload').click()" title="Click to Change Picture">
+            <h3>Mr. KATONGO C GRADE 7B CLASS TEACHER..</h3>
+        </div>
+        <ul>
+                <li><a href="dashboard.html">🏠 Dashboard</a></li>
+                <li><a href="enrollment.html">👥 Grade 7 Enrollment</a></li>
+                <li><a href="daily_register.html">📝 Daily Register</a></li>
+                <li><a href="mark_entry.html">📊 Enter Marks</a></li>
+                <li><a href="view_marks.html">📜 View Results </a></li>
+                <li><a href="daily_attendance_list.html" style="background: #34495e;">📂 Daily Attendance list</a></li>
+                
+                <li><a href="term_attendance.html">📂 Term Attendance</a></li>
+                <li><a href="index.html" style="color: var(--danger);">🚪 Logout</a></li>
+            </ul>
+    </nav>
+
+    <div class="main" id="main">
+        <button class="menu-btn" onclick="toggleMenu()">☰ Toggle Menu</button>
+        <h1 style="color: var(--primary);">School Management Dashboard</h1>
+        
+        <div class="card-grid">
+            <div class="card"><h2>Boys</h2><p id="b-count">0</p></div>
+            <div class="card"><h2>Girls</h2><p id="g-count">0</p></div>
+            <div class="card"><h2>Total</h2><p id="t-count">0</p></div>
+        </div>
+    </div>
+
+    <div class="rotating-badge">GRADE 7B<br>PERFORMANCE & ABSENTEEISM<br>TRACKED BY <br> MR. KATONGO<br>&copy; 2026</div>
+
+    <script>
+        if(localStorage.getItem('loggedIn') !== 'true') window.location.href = 'index.html';
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('hidden');
+            document.getElementById('main').classList.toggle('full');
+        }
+
+        // Integrated Picture Upload Logic
+        function uploadPic(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    localStorage.setItem('profile_pic', e.target.result);
+                    document.getElementById('user-pic').src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('loggedIn');
+            window.location.href = 'index.html';
+        }
+
+        // Load Counts and Saved Pic
+        window.onload = () => {
+            const data = JSON.parse(localStorage.getItem('grade7C_data')) || [];
+            document.getElementById('b-count').innerText = data.filter(s => s.gender === 'Boy').length;
+            document.getElementById('g-count').innerText = data.filter(s => s.gender === 'Girl').length;
+            document.getElementById('t-count').innerText = data.length;
+
+            const savedPic = localStorage.getItem('profile_pic');
+            if(savedPic) document.getElementById('user-pic').src = savedPic;
+        };
+    </script>
+</body>
+</html>
